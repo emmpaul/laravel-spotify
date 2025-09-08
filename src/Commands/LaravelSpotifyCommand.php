@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace emmpaul\LaravelSpotify\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class LaravelSpotifyCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-spotify';
 
     public $description = 'My command';
 
