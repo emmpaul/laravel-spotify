@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
 class SpotifyAuthController extends Controller
@@ -43,10 +44,10 @@ class SpotifyAuthController extends Controller
             Auth::login($user);
 
             return redirect()->intended(config('spotify.redirect_route_after_login'));
-
         } catch (\Exception $e) {
+            Log::error('Spotify authentication failed: ' . $e->getMessage());
             return redirect('/login')->withErrors([
-                'spotify' => 'Authentication with Spotify failed: '.$e->getMessage(),
+                'spotify' => 'Authentication with Spotify failed',
             ]);
         }
     }
