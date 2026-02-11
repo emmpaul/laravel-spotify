@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('spotify_id')->nullable()->unique()->after('email');
-            $table->string('spotify_avatar')->nullable();
+            $table->text('spotify_avatar')->nullable();
             $table->text('spotify_token')->nullable()->after('spotify_id');
             $table->text('spotify_refresh_token')->nullable()->after('spotify_token');
             $table->timestamp('spotify_token_expires_at')->nullable()->after('spotify_refresh_token');
