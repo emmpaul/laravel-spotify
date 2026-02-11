@@ -207,6 +207,9 @@ $spotify->api()->getAlbum($albumId);
 $spotify->api()->getAlbums([$albumId1, $albumId2]);
 $spotify->api()->getAlbumTracks($albumId);
 $spotify->api()->getUserSavedAlbums();
+$spotify->api()->checkUsersSavedAlbums([$albumId1, $albumId2]);
+$spotify->api()->saveAlbumsForCurrentUser([$albumId1, $albumId2]);
+$spotify->api()->removeUsersSavedAlbums([$albumId1, $albumId2]);
 $spotify->api()->getNewReleases();
 ```
 
@@ -223,6 +226,9 @@ $spotify->api()->getArtistsTopTracks($artistId);
 $spotify->api()->getTrack($trackId);
 $spotify->api()->getSeveralTracks([$trackId1, $trackId2]);
 $spotify->api()->getUsersSavedTracks();
+$spotify->api()->checkUsersSavedTracks([$trackId1, $trackId2]);
+$spotify->api()->saveTracksForCurrentUser([$trackId1, $trackId2]);
+$spotify->api()->removeUsersSavedTracks([$trackId1, $trackId2]);
 ```
 
 #### Playlists
@@ -265,6 +271,27 @@ $spotify->api()->getPlaybackState();
 $spotify->api()->getCurrentlyPlayingTrack();
 $spotify->api()->getAvailableDevices();
 $spotify->api()->getTheUsersQueue();
+```
+
+#### Shows
+```php
+$spotify->api()->getShow($showId);
+$spotify->api()->getSeveralShows([$showId1, $showId2]);
+$spotify->api()->getShowEpisodes($showId);
+$spotify->api()->getUsersSavedShows();
+$spotify->api()->checkUsersSavedShows([$showId1, $showId2]);
+$spotify->api()->saveShowsForCurrentUser([$showId1, $showId2]);
+$spotify->api()->removeUsersSavedShows([$showId1, $showId2]);
+```
+
+#### Episodes
+```php
+$spotify->api()->getEpisode($episodeId);
+$spotify->api()->getSeveralEpisodes([$episodeId1, $episodeId2]);
+$spotify->api()->getUsersSavedEpisodes();
+$spotify->api()->checkUsersSavedEpisodes([$episodeId1, $episodeId2]);
+$spotify->api()->saveEpisodesForCurrentUser([$episodeId1, $episodeId2]);
+$spotify->api()->removeUsersSavedEpisodes([$episodeId1, $episodeId2]);
 ```
 
 #### Search

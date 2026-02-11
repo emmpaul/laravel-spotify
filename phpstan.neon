@@ -1,0 +1,24 @@
+parameters:
+    level: 7
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        -
+            identifier: property.notFound
+            path: tests/*
+        -
+            identifier: method.notFound
+            path: tests/ArchTest.php
+        -
+            identifier: argument.type
+            path: tests/TestCase.php
+        -
+            identifier: class.notFound
+            path: src/Controllers/SpotifyAuthController.php
+        -
+            identifier: property.notFound
+            path: src/Controllers/SpotifyAuthController.php
+        -
+            identifier: trait.unused
+            path: src/Traits/HasSpotifyAuth.php
