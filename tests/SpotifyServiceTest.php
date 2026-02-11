@@ -831,14 +831,14 @@ describe('Player Controls', function () {
             'api.spotify.com/v1/me/player/play*' => Http::response(null, 204),
         ]);
 
-        $this->service->resumePlayback('device-123', ['spotify:track:abc', 'spotify:track:def']);
+        $this->service->resumePlayback('device-123', ['abc', 'def']);
 
         Http::assertSent(function ($request) {
             $body = $request->data();
 
             return str_contains($request->url(), 'me/player/play') &&
                    isset($body['uris']) &&
-                   count($body['uris']) === 2;
+                   $body['uris'] === ['spotify:track:abc', 'spotify:track:def'];
         });
     });
 
