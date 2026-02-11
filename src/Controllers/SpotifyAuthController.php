@@ -39,8 +39,8 @@ class SpotifyAuthController extends Controller
                 'spotify_avatar' => $spotifyUser->getAvatar(),
                 'spotify_token' => $spotifyUser->token ?? null,
                 'spotify_refresh_token' => $spotifyUser->refreshToken ?? null,
-                'spotify_token_expires_at' => ! empty($spotifyUser->expiresIn)
-                    ? Carbon::now()->addSeconds($spotifyUser->expiresIn)
+                'spotify_token_expires_at' => $spotifyUser->expiresIn !== null
+                    ? Carbon::now()->addSeconds((int) $spotifyUser->expiresIn)
                     : Carbon::now()->addMinutes(59),
             ]);
 
