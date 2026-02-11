@@ -35,7 +35,7 @@ trait HasSpotifyAuth
     public function isSpotifyTokenExpired(): bool
     {
         if (! $this->spotify_token_expires_at) {
-            return false;
+            return true;
         }
 
         return Carbon::now()->isAfter($this->spotify_token_expires_at);
