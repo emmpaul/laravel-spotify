@@ -779,6 +779,169 @@ describe('Playlists', function () {
     });
 });
 
+describe('Playlist Management', function () {
+    it('createPlaylist sends POST with required name field', function () {
+        Http::fake([
+            'api.spotify.com/v1/users/test-user/playlists' => Http::response(['id' => 'new-playlist'], 201),
+        ]);
+
+        $response = $this->service->createPlaylist('test-user', 'My Playlist');
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://api.spotify.com/v1/users/test-user/playlists' &&
+                   $request->method() === 'POST' &&
+                   $request['name'] === 'My Playlist';
+        });
+
+        expect($response)->toBeInstanceOf(Response::class);
+    });
+
+    it('createPlaylist sends all optional parameters', function () {
+        Http::fake([
+            'api.spotify.com/v1/users/test-user/playlists' => Http::response(['id' => 'new-playlist'], 201),
+        ]);
+
+        $this->service->createPlaylist('test-user', 'My Playlist', 'A description', false, true);
+
+        Http::assertSent(function ($request) {
+            return $request['name'] === 'My Playlist' &&
+                   $request['description'] === 'A description' &&
+                   $request['public'] === false &&
+                   $request['collaborative'] === true;
+        });
+    });
+
+    it('addItemsToPlaylist sends POST with uris array', function () {
+        Http::fake([
+            'api.spotify.com/v1/playlists/test-playlist/tracks' => Http::response(['snapshot_id' => 'snap123'], 201),
+        ]);
+
+        $uris = ['spotify:track:xxx', 'spotify:track:yyy'];
+        $this->service->addItemsToPlaylist('test-playlist', $uris);
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://api.spotify.com/v1/playlists/test-playlist/tracks' &&
+                   $request->method() === 'POST' &&
+                   $request['uris'] === ['spotify:track:xxx', 'spotify:track:yyy'];
+        });
+    });
+
+    it('addItemsToPlaylist accepts string uris', function () {
+        Http::fake([
+            'api.spotify.com/v1/playlists/test-playlist/tracks' => Http::response(['snapshot_id' => 'snap123'], 201),
+        ]);
+
+        $this->service->addItemsToPlaylist('test-playlist', 'spotify:track:xxx,spotify:track:yyy');
+
+        Http::assertSent(function ($request) {
+            return $request['uris'] === ['spotify:track:xxx', 'spotify:track:yyy'];
+        });
+    });
+
+    it('addItemsToPlaylist sends position when provided', function () {
+        Http::fake([
+            'api.spotify.com/v1/playlists/test-playlist/tracks' => Http::response(['snapshot_id' => 'snap123'], 201),
+        ]);
+
+        $this->service->addItemsToPlaylist('test-playlist', ['spotify:track:xxx'], 2);
+
+        Http::assertSent(function ($request) {
+            return $request['position'] === 2;
+        });
+    });
+
+    it('removePlaylistItems sends DELETE with formatted track objects', function () {
+        Http::fake([
+            'api.spotify.com/v1/playlists/test-playlist/tracks' => Http::response(['snapshot_id' => 'snap123'], 200),
+        ]);
+
+        $this->service->removePlaylistItems('test-playlist', ['spotify:track:xxx', 'spotify:track:yyy']);
+
+        Http::assertSent(function ($request) {
+            return $request->method() === 'DELETE' &&
+                   $request['tracks'] === [
+                       ['uri' => 'spotify:track:xxx'],
+                       ['uri' => 'spotify:track:yyy'],
+                   ];
+        });
+    });
+
+    it('removePlaylistItems accepts string uris', function () {
+        Http::fake([
+            'api.spotify.com/v1/playlists/test-playlist/tracks' => Http::response(['snapshot_id' => 'snap123'], 200),
+        ]);
+
+        $this->service->removePlaylistItems('test-playlist', 'spotify:track:xxx');
+
+        Http::assertSent(function ($request) {
+            return $request['tracks'] === [
+                ['uri' => 'spotify:track:xxx'],
+            ];
+        });
+    });
+
+    it('updatePlaylistDetails sends PUT with only non-null fields', function () {
+        Http::fake([
+            'api.spotify.com/v1/playlists/test-playlist' => Http::response([], 200),
+        ]);
+
+        $this->service->updatePlaylistDetails('test-playlist', name: 'New Name');
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://api.spotify.com/v1/playlists/test-playlist' &&
+                   $request->method() === 'PUT' &&
+                   $request['name'] === 'New Name' &&
+                   ! isset($request['description']) &&
+                   ! isset($request['public']) &&
+                   ! isset($request['collaborative']);
+        });
+    });
+
+    it('updatePlaylistDetails sends multiple fields', function () {
+        Http::fake([
+            'api.spotify.com/v1/playlists/test-playlist' => Http::response([], 200),
+        ]);
+
+        $this->service->updatePlaylistDetails('test-playlist', name: 'New Name', description: 'New Desc', public: true);
+
+        Http::assertSent(function ($request) {
+            return $request['name'] === 'New Name' &&
+                   $request['description'] === 'New Desc' &&
+                   $request['public'] === true;
+        });
+    });
+
+    it('reorderPlaylistItems sends PUT with reorder parameters', function () {
+        Http::fake([
+            'api.spotify.com/v1/playlists/test-playlist/tracks' => Http::response(['snapshot_id' => 'snap123'], 200),
+        ]);
+
+        $this->service->reorderPlaylistItems('test-playlist', rangeStart: 0, insertBefore: 3);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'playlists/test-playlist/tracks') &&
+                   $request->method() === 'PUT' &&
+                   $request['range_start'] === 0 &&
+                   $request['insert_before'] === 3;
+        });
+    });
+
+    it('reorderPlaylistItems sends optional parameters', function () {
+        Http::fake([
+            'api.spotify.com/v1/playlists/test-playlist/tracks' => Http::response(['snapshot_id' => 'snap123'], 200),
+        ]);
+
+        $this->service->reorderPlaylistItems('test-playlist', 0, 3, 2, 'snap-abc');
+
+        Http::assertSent(function ($request) {
+            return $request['range_start'] === 0 &&
+                   $request['insert_before'] === 3 &&
+                   $request['range_length'] === 2 &&
+                   $request['snapshot_id'] === 'snap-abc';
+        });
+    });
+});
+
 describe('Search', function () {
     it('searchForItem calls correct endpoint', function () {
         Http::fake([

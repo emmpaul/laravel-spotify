@@ -227,10 +227,19 @@ $spotify->api()->getUsersSavedTracks();
 
 #### Playlists
 ```php
+// Read operations
 $spotify->api()->getPlaylist($playlistId);
 $spotify->api()->getPlaylistItems($playlistId);
 $spotify->api()->getCurrentUsersPlaylists();
 $spotify->api()->getUsersPlaylists($userId);
+$spotify->api()->getPlaylistCoverImage($playlistId);
+
+// Playlist management
+$spotify->api()->createPlaylist($userId, 'My Playlist', 'Description');
+$spotify->api()->addItemsToPlaylist($playlistId, ['spotify:track:xxx', 'spotify:track:yyy']);
+$spotify->api()->removePlaylistItems($playlistId, ['spotify:track:xxx']);
+$spotify->api()->updatePlaylistDetails($playlistId, name: 'New Name');
+$spotify->api()->reorderPlaylistItems($playlistId, rangeStart: 0, insertBefore: 3);
 ```
 
 #### User Data

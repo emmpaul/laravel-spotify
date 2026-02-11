@@ -83,10 +83,16 @@ class SpotifyService
             throw new RuntimeException('Access token is required');
         }
 
-        return Http::withHeaders([
+        $headers = [
             'Authorization' => 'Bearer '.$this->accessToken,
             'Content-Type' => 'application/json',
-        ])->$method($this->baseUrl.$endpoint, $data);
+        ];
+
+        if ($method === 'delete') {
+            return Http::withHeaders($headers)->send('DELETE', $this->baseUrl.$endpoint, ['json' => $data]);
+        }
+
+        return Http::withHeaders($headers)->$method($this->baseUrl.$endpoint, $data);
     }
 
     // Albums
@@ -623,6 +629,108 @@ class SpotifyService
     public function getPlaylistCoverImage(string $playlistId): Response
     {
         return $this->makeRequest('get', '/playlists/'.$playlistId.'/images');
+    }
+
+    /**
+     * Create a playlist for a Spotify user.
+     *
+     * @param  string  $userId  User ID.
+     * @param  string  $name  Playlist name.
+     * @param  string|null  $description  Playlist description.
+     * @param  bool|null  $public  Whether the playlist is public.
+     * @param  bool|null  $collaborative  Whether the playlist is collaborative.
+     * @return Response The HTTP response containing the created playlist.
+     */
+    public function createPlaylist(string $userId, string $name, ?string $description = null, ?bool $public = null, ?bool $collaborative = null): Response
+    {
+        $data = array_filter([
+            'name' => $name,
+            'description' => $description,
+            'public' => $public,
+            'collaborative' => $collaborative,
+        ], fn ($value) => $value !== null);
+
+        return $this->makeRequest('post', '/users/'.$userId.'/playlists', $data);
+    }
+
+    /**
+     * Add items to a playlist.
+     *
+     * @param  string  $playlistId  Playlist ID.
+     * @param  string|array<string>  $uris  Spotify URIs to add.
+     * @param  int|null  $position  Position to insert the items (default: null, appends to end).
+     * @return Response The HTTP response containing a snapshot_id.
+     */
+    public function addItemsToPlaylist(string $playlistId, string|array $uris, ?int $position = null): Response
+    {
+        $data = array_filter([
+            'uris' => $this->normalizeToArray($uris),
+            'position' => $position,
+        ], fn ($value) => $value !== null);
+
+        return $this->makeRequest('post', '/playlists/'.$playlistId.'/tracks', $data);
+    }
+
+    /**
+     * Remove items from a playlist.
+     *
+     * @param  string  $playlistId  Playlist ID.
+     * @param  string|array<string>  $uris  Spotify URIs to remove.
+     * @return Response The HTTP response containing a snapshot_id.
+     */
+    public function removePlaylistItems(string $playlistId, string|array $uris): Response
+    {
+        $tracks = collect($this->normalizeToArray($uris))
+            ->map(fn ($uri) => ['uri' => $uri])
+            ->toArray();
+
+        return $this->makeRequest('delete', '/playlists/'.$playlistId.'/tracks', [
+            'tracks' => $tracks,
+        ]);
+    }
+
+    /**
+     * Update playlist details.
+     *
+     * @param  string  $playlistId  Playlist ID.
+     * @param  string|null  $name  New playlist name.
+     * @param  string|null  $description  New playlist description.
+     * @param  bool|null  $public  Whether the playlist is public.
+     * @param  bool|null  $collaborative  Whether the playlist is collaborative.
+     * @return Response The HTTP response.
+     */
+    public function updatePlaylistDetails(string $playlistId, ?string $name = null, ?string $description = null, ?bool $public = null, ?bool $collaborative = null): Response
+    {
+        $data = array_filter([
+            'name' => $name,
+            'description' => $description,
+            'public' => $public,
+            'collaborative' => $collaborative,
+        ], fn ($value) => $value !== null);
+
+        return $this->makeRequest('put', '/playlists/'.$playlistId, $data);
+    }
+
+    /**
+     * Reorder items in a playlist.
+     *
+     * @param  string  $playlistId  Playlist ID.
+     * @param  int  $rangeStart  Position of the first item to be reordered.
+     * @param  int  $insertBefore  Position where the items should be inserted.
+     * @param  int|null  $rangeLength  Number of items to be reordered (default: 1).
+     * @param  string|null  $snapshotId  Playlist snapshot ID.
+     * @return Response The HTTP response containing a snapshot_id.
+     */
+    public function reorderPlaylistItems(string $playlistId, int $rangeStart, int $insertBefore, ?int $rangeLength = null, ?string $snapshotId = null): Response
+    {
+        $data = array_filter([
+            'range_start' => $rangeStart,
+            'insert_before' => $insertBefore,
+            'range_length' => $rangeLength,
+            'snapshot_id' => $snapshotId,
+        ], fn ($value) => $value !== null);
+
+        return $this->makeRequest('put', '/playlists/'.$playlistId.'/tracks', $data);
     }
 
     // Search
