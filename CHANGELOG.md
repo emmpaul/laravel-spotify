@@ -2,17 +2,6 @@
 
 All notable changes to `laravel-spotify` will be documented in this file.
 
-## Unreleased
-
-### Added
-
-- `createPlaylist()` - Create a playlist for a Spotify user
-- `addItemsToPlaylist()` - Add items to a playlist
-- `removePlaylistItems()` - Remove items from a playlist
-- `updatePlaylistDetails()` - Update a playlist's name, description, and visibility
-- `reorderPlaylistItems()` - Reorder items in a playlist
-- Support for DELETE requests with JSON body in `makeRequest`
-
 ## release v1.2.0 - 2026-02-11
 
 ### What's Changed
