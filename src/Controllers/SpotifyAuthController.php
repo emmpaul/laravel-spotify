@@ -4,6 +4,7 @@ namespace emmpaul\LaravelSpotify\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
@@ -38,6 +39,9 @@ class SpotifyAuthController extends Controller
                 'spotify_avatar' => $spotifyUser->getAvatar(),
                 'spotify_token' => $spotifyUser->token ?? null,
                 'spotify_refresh_token' => $spotifyUser->refreshToken ?? null,
+                'spotify_token_expires_at' => ! empty($spotifyUser->expiresIn)
+                    ? Carbon::now()->addSeconds($spotifyUser->expiresIn)
+                    : Carbon::now()->addMinutes(59),
             ]);
 
             Auth::login($user);
