@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-spotify` will be documented in this file.
 
+## release v1.2.0 - 2026-02-11
+
+### What's Changed
+
+* Fixes avatar issue + better logging by @shahzeb1 in https://github.com/emmpaul/laravel-spotify/pull/5
+* build(deps): bump actions/checkout from 5 to 6 by @dependabot[bot] in https://github.com/emmpaul/laravel-spotify/pull/3
+* build(deps): bump stefanzweifel/git-auto-commit-action from 6 to 7 by @dependabot[bot] in https://github.com/emmpaul/laravel-spotify/pull/2
+
+### New Contributors
+
+* @shahzeb1 made their first contribution in https://github.com/emmpaul/laravel-spotify/pull/5
+
+**Full Changelog**: https://github.com/emmpaul/laravel-spotify/compare/v1.1.0...v1.2.0
+
 ## Release v1.1.0 - 2026-02-11
 
 ### What's Changed
