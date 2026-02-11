@@ -638,9 +638,9 @@ class SpotifyService
      */
     public function skipToNext(?string $deviceId = null): Response
     {
-        return $this->makeRequest('post', '/me/player/next', array_filter([
-            'device_id' => $deviceId,
-        ]));
+        $query = http_build_query(array_filter(['device_id' => $deviceId]));
+
+        return $this->makeRequest('post', '/me/player/next'.($query ? '?'.$query : ''));
     }
 
     /**
@@ -651,9 +651,9 @@ class SpotifyService
      */
     public function skipToPrevious(?string $deviceId = null): Response
     {
-        return $this->makeRequest('post', '/me/player/previous', array_filter([
-            'device_id' => $deviceId,
-        ]));
+        $query = http_build_query(array_filter(['device_id' => $deviceId]));
+
+        return $this->makeRequest('post', '/me/player/previous'.($query ? '?'.$query : ''));
     }
 
     /**
@@ -671,7 +671,7 @@ class SpotifyService
             $params['device_id'] = $deviceId;
         }
 
-        return $this->makeRequest('put', '/me/player/seek', $params);
+        return $this->makeRequest('put', '/me/player/seek?'.http_build_query($params));
     }
 
     /**
@@ -685,10 +685,13 @@ class SpotifyService
     {
         $stateValue = $state instanceof SpotifyRepeatState ? $state->value : $state;
 
-        return $this->makeRequest('put', '/me/player/repeat', array_filter([
-            'state' => $stateValue,
-            'device_id' => $deviceId,
-        ]));
+        $params = ['state' => $stateValue];
+
+        if ($deviceId !== null) {
+            $params['device_id'] = $deviceId;
+        }
+
+        return $this->makeRequest('put', '/me/player/repeat?'.http_build_query($params));
     }
 
     /**
@@ -700,13 +703,13 @@ class SpotifyService
      */
     public function toggleShuffle(bool $state, ?string $deviceId = null): Response
     {
-        $params = ['state' => $state];
+        $params = ['state' => $state ? 'true' : 'false'];
 
         if ($deviceId !== null) {
             $params['device_id'] = $deviceId;
         }
 
-        return $this->makeRequest('put', '/me/player/shuffle', $params);
+        return $this->makeRequest('put', '/me/player/shuffle?'.http_build_query($params));
     }
 
     /**
@@ -726,7 +729,7 @@ class SpotifyService
             $params['device_id'] = $deviceId;
         }
 
-        return $this->makeRequest('put', '/me/player/volume', $params);
+        return $this->makeRequest('put', '/me/player/volume?'.http_build_query($params));
     }
 
     /**
@@ -753,10 +756,13 @@ class SpotifyService
      */
     public function addItemToPlaybackQueue(string $uri, ?string $deviceId = null): Response
     {
-        return $this->makeRequest('post', '/me/player/queue', array_filter([
-            'uri' => $uri,
-            'device_id' => $deviceId,
-        ]));
+        $params = ['uri' => $uri];
+
+        if ($deviceId !== null) {
+            $params['device_id'] = $deviceId;
+        }
+
+        return $this->makeRequest('post', '/me/player/queue?'.http_build_query($params));
     }
 
     // Playlists
