@@ -335,6 +335,60 @@ describe('Albums', function () {
         });
     });
 
+    it('saveAlbumsForCurrentUser sends PUT with array ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/albums' => Http::response([], 200),
+        ]);
+
+        $this->service->saveAlbumsForCurrentUser(['id1', 'id2']);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/albums') &&
+                   $request->method() === 'PUT' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('saveAlbumsForCurrentUser accepts string ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/albums' => Http::response([], 200),
+        ]);
+
+        $this->service->saveAlbumsForCurrentUser('id1,id2');
+
+        Http::assertSent(function ($request) {
+            return $request->method() === 'PUT' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('removeUsersSavedAlbums sends DELETE with array ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/albums' => Http::response([], 200),
+        ]);
+
+        $this->service->removeUsersSavedAlbums(['id1', 'id2']);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/albums') &&
+                   $request->method() === 'DELETE' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('removeUsersSavedAlbums accepts string ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/albums' => Http::response([], 200),
+        ]);
+
+        $this->service->removeUsersSavedAlbums('id1,id2');
+
+        Http::assertSent(function ($request) {
+            return $request->method() === 'DELETE' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
     it('getNewReleases calls correct endpoint', function () {
         Http::fake([
             'api.spotify.com/v1/browse/new-releases*' => Http::response(['albums' => []], 200),
@@ -592,6 +646,60 @@ describe('Episodes', function () {
         Http::assertSent(function ($request) {
             return str_contains($request->url(), 'me/episodes/contains') &&
                    str_contains($request->url(), 'ids=test-id');
+        });
+    });
+
+    it('saveEpisodesForCurrentUser sends PUT with array ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/episodes' => Http::response([], 200),
+        ]);
+
+        $this->service->saveEpisodesForCurrentUser(['id1', 'id2']);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/episodes') &&
+                   $request->method() === 'PUT' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('saveEpisodesForCurrentUser accepts string ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/episodes' => Http::response([], 200),
+        ]);
+
+        $this->service->saveEpisodesForCurrentUser('id1,id2');
+
+        Http::assertSent(function ($request) {
+            return $request->method() === 'PUT' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('removeUsersSavedEpisodes sends DELETE with array ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/episodes' => Http::response([], 200),
+        ]);
+
+        $this->service->removeUsersSavedEpisodes(['id1', 'id2']);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/episodes') &&
+                   $request->method() === 'DELETE' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('removeUsersSavedEpisodes accepts string ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/episodes' => Http::response([], 200),
+        ]);
+
+        $this->service->removeUsersSavedEpisodes('id1,id2');
+
+        Http::assertSent(function ($request) {
+            return $request->method() === 'DELETE' &&
+                   $request['ids'] === ['id1', 'id2'];
         });
     });
 });
@@ -1033,6 +1141,60 @@ describe('Shows', function () {
                    str_contains($request->url(), 'ids=test-id');
         });
     });
+
+    it('saveShowsForCurrentUser sends PUT with array ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/shows' => Http::response([], 200),
+        ]);
+
+        $this->service->saveShowsForCurrentUser(['id1', 'id2']);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/shows') &&
+                   $request->method() === 'PUT' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('saveShowsForCurrentUser accepts string ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/shows' => Http::response([], 200),
+        ]);
+
+        $this->service->saveShowsForCurrentUser('id1,id2');
+
+        Http::assertSent(function ($request) {
+            return $request->method() === 'PUT' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('removeUsersSavedShows sends DELETE with array ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/shows' => Http::response([], 200),
+        ]);
+
+        $this->service->removeUsersSavedShows(['id1', 'id2']);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/shows') &&
+                   $request->method() === 'DELETE' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('removeUsersSavedShows accepts string ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/shows' => Http::response([], 200),
+        ]);
+
+        $this->service->removeUsersSavedShows('id1,id2');
+
+        Http::assertSent(function ($request) {
+            return $request->method() === 'DELETE' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
 });
 
 describe('Tracks', function () {
@@ -1088,6 +1250,60 @@ describe('Tracks', function () {
         Http::assertSent(function ($request) {
             return str_contains($request->url(), 'me/tracks/contains') &&
                    str_contains($request->url(), 'ids=test-id');
+        });
+    });
+
+    it('saveTracksForCurrentUser sends PUT with array ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/tracks' => Http::response([], 200),
+        ]);
+
+        $this->service->saveTracksForCurrentUser(['id1', 'id2']);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/tracks') &&
+                   $request->method() === 'PUT' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('saveTracksForCurrentUser accepts string ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/tracks' => Http::response([], 200),
+        ]);
+
+        $this->service->saveTracksForCurrentUser('id1,id2');
+
+        Http::assertSent(function ($request) {
+            return $request->method() === 'PUT' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('removeUsersSavedTracks sends DELETE with array ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/tracks' => Http::response([], 200),
+        ]);
+
+        $this->service->removeUsersSavedTracks(['id1', 'id2']);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/tracks') &&
+                   $request->method() === 'DELETE' &&
+                   $request['ids'] === ['id1', 'id2'];
+        });
+    });
+
+    it('removeUsersSavedTracks accepts string ids', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/tracks' => Http::response([], 200),
+        ]);
+
+        $this->service->removeUsersSavedTracks('id1,id2');
+
+        Http::assertSent(function ($request) {
+            return $request->method() === 'DELETE' &&
+                   $request['ids'] === ['id1', 'id2'];
         });
     });
 });

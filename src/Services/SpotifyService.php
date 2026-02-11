@@ -67,6 +67,10 @@ class SpotifyService
         return max(1, min(50, $limit));
     }
 
+    /**
+     * @param  string|array<string>  $value  Value to normalize.
+     * @return array<string>
+     */
     protected function normalizeToArray(string|array $value): array
     {
         return is_array($value) ? $value : explode(',', $value);
@@ -178,6 +182,32 @@ class SpotifyService
     {
         return $this->makeRequest('get', '/me/albums/contains', [
             'ids' => $this->normalizeToCommaSeparated($albumIds),
+        ]);
+    }
+
+    /**
+     * Save one or more albums to the current user's 'Your Music' library.
+     *
+     * @param  string|array<string>  $albumIds  Album IDs to save (comma-separated string or array).
+     * @return Response The HTTP response.
+     */
+    public function saveAlbumsForCurrentUser(string|array $albumIds): Response
+    {
+        return $this->makeRequest('put', '/me/albums', [
+            'ids' => $this->normalizeToArray($albumIds),
+        ]);
+    }
+
+    /**
+     * Remove one or more albums from the current user's 'Your Music' library.
+     *
+     * @param  string|array<string>  $albumIds  Album IDs to remove (comma-separated string or array).
+     * @return Response The HTTP response.
+     */
+    public function removeUsersSavedAlbums(string|array $albumIds): Response
+    {
+        return $this->makeRequest('delete', '/me/albums', [
+            'ids' => $this->normalizeToArray($albumIds),
         ]);
     }
 
@@ -466,6 +496,32 @@ class SpotifyService
         ]);
     }
 
+    /**
+     * Save one or more episodes to the current user's library.
+     *
+     * @param  string|array<string>  $episodeIds  Episode IDs to save (comma-separated string or array).
+     * @return Response The HTTP response.
+     */
+    public function saveEpisodesForCurrentUser(string|array $episodeIds): Response
+    {
+        return $this->makeRequest('put', '/me/episodes', [
+            'ids' => $this->normalizeToArray($episodeIds),
+        ]);
+    }
+
+    /**
+     * Remove one or more episodes from the current user's library.
+     *
+     * @param  string|array<string>  $episodeIds  Episode IDs to remove (comma-separated string or array).
+     * @return Response The HTTP response.
+     */
+    public function removeUsersSavedEpisodes(string|array $episodeIds): Response
+    {
+        return $this->makeRequest('delete', '/me/episodes', [
+            'ids' => $this->normalizeToArray($episodeIds),
+        ]);
+    }
+
     // Markets
 
     /**
@@ -555,6 +611,9 @@ class SpotifyService
         return $this->makeRequest('get', '/me/player/queue');
     }
 
+    /**
+     * @param  string|array<string>|null  $trackIds
+     */
     public function resumePlayback(string $deviceId, string|array|null $trackIds = null): Response
     {
         return $this->makeRequest('put', '/me/player/play', [
@@ -870,6 +929,32 @@ class SpotifyService
         ]);
     }
 
+    /**
+     * Save one or more shows to the current user's library.
+     *
+     * @param  string|array<string>  $showIds  Show IDs to save (comma-separated string or array).
+     * @return Response The HTTP response.
+     */
+    public function saveShowsForCurrentUser(string|array $showIds): Response
+    {
+        return $this->makeRequest('put', '/me/shows', [
+            'ids' => $this->normalizeToArray($showIds),
+        ]);
+    }
+
+    /**
+     * Remove one or more shows from the current user's library.
+     *
+     * @param  string|array<string>  $showIds  Show IDs to remove (comma-separated string or array).
+     * @return Response The HTTP response.
+     */
+    public function removeUsersSavedShows(string|array $showIds): Response
+    {
+        return $this->makeRequest('delete', '/me/shows', [
+            'ids' => $this->normalizeToArray($showIds),
+        ]);
+    }
+
     // Tracks
 
     /**
@@ -930,6 +1015,32 @@ class SpotifyService
     {
         return $this->makeRequest('get', '/me/tracks/contains', [
             'ids' => $this->normalizeToCommaSeparated($trackIds),
+        ]);
+    }
+
+    /**
+     * Save one or more tracks to the current user's 'Your Music' library.
+     *
+     * @param  string|array<string>  $trackIds  Track IDs to save (comma-separated string or array).
+     * @return Response The HTTP response.
+     */
+    public function saveTracksForCurrentUser(string|array $trackIds): Response
+    {
+        return $this->makeRequest('put', '/me/tracks', [
+            'ids' => $this->normalizeToArray($trackIds),
+        ]);
+    }
+
+    /**
+     * Remove one or more tracks from the current user's 'Your Music' library.
+     *
+     * @param  string|array<string>  $trackIds  Track IDs to remove (comma-separated string or array).
+     * @return Response The HTTP response.
+     */
+    public function removeUsersSavedTracks(string|array $trackIds): Response
+    {
+        return $this->makeRequest('delete', '/me/tracks', [
+            'ids' => $this->normalizeToArray($trackIds),
         ]);
     }
 
@@ -1065,6 +1176,10 @@ class SpotifyService
         return $this->getCurrentUsersProfile();
     }
 
+    /**
+     * @param  string|array<string>  $trackIds
+     * @return array<string>
+     */
     protected function formatForTracksPlayback(string|array $trackIds): array
     {
         return collect($this->normalizeToArray($trackIds))->map(fn ($track) => 'spotify:track:'.$track)->toArray();
