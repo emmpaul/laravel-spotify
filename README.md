@@ -267,6 +267,8 @@ $spotify->api()->getRecentlyPlayedTracks(50);
 
 #### Player/Playback
 ```php
+use emmpaul\LaravelSpotify\Enums\SpotifyRepeatState;
+
 // Get player info
 $spotify->api()->getPlaybackState();
 $spotify->api()->getCurrentlyPlayingTrack();
