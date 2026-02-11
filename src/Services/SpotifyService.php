@@ -62,6 +62,11 @@ class SpotifyService
         return is_array($value) ? implode(',', $value) : $value;
     }
 
+    protected function clampLimit(int $limit): int
+    {
+        return max(1, min(50, $limit));
+    }
+
     protected function normalizeToArray(string|array $value): array
     {
         return is_array($value) ? $value : explode(',', $value);
@@ -129,6 +134,8 @@ class SpotifyService
      */
     public function getAlbumTracks(string $albumId, ?string $market = null, int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/albums/'.$albumId.'/tracks', [
             'market' => $market,
             'limit' => $limit,
@@ -146,6 +153,8 @@ class SpotifyService
      */
     public function getUserSavedAlbums(int $limit = 20, int $offset = 0, ?string $market = null): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/me/albums', [
             'limit' => $limit,
             'offset' => $offset,
@@ -175,6 +184,8 @@ class SpotifyService
      */
     public function getNewReleases(int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/browse/new-releases', [
             'limit' => $limit,
             'offset' => $offset,
@@ -220,6 +231,8 @@ class SpotifyService
      */
     public function getArtistsAlbums(string $artistId, string|array $include_groups = [], ?string $market = null, int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/artists/'.$artistId.'/albums', [
             'include_groups' => $this->normalizeToCommaSeparated($include_groups),
             'market' => $market,
@@ -281,6 +294,8 @@ class SpotifyService
      */
     public function getAudiobookChapters(string $audiobookId, ?string $market = null, int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/audiobooks/'.$audiobookId.'/chapters', [
             'market' => $market,
             'limit' => $limit,
@@ -297,6 +312,8 @@ class SpotifyService
      */
     public function getUsersSavedAudiobooks(int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/me/audiobooks', [
             'limit' => $limit,
             'offset' => $offset,
@@ -328,6 +345,8 @@ class SpotifyService
      */
     public function getSeveralBrowseCategories(?string $locale = null, int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/browse/categories', [
             'locale' => $locale,
             'limit' => $limit,
@@ -419,6 +438,8 @@ class SpotifyService
      */
     public function getUsersSavedEpisodes(?string $market = null, int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/me/episodes', [
             'market' => $market,
             'limit' => $limit,
@@ -505,6 +526,8 @@ class SpotifyService
      */
     public function getRecentlyPlayedTracks(int $limit = 20, ?int $after = null, ?int $before = null): Response
     {
+        $limit = $this->clampLimit($limit);
+
         if ($after && $before) {
             throw new RuntimeException('Only one of after or before can be provided');
         }
@@ -574,6 +597,8 @@ class SpotifyService
      */
     public function getPlaylistItems(string $playlistId, ?string $market = null, string|array|null $fields = null, int $limit = 20, int $offset = 0, string|array|null $additional_types = null): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/playlists/'.$playlistId.'/tracks', [
             'market' => $market,
             'fields' => $fields ? $this->normalizeToCommaSeparated($fields) : null,
@@ -592,6 +617,8 @@ class SpotifyService
      */
     public function getCurrentUsersPlaylists(int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/me/playlists', [
             'limit' => $limit,
             'offset' => $offset,
@@ -608,6 +635,8 @@ class SpotifyService
      */
     public function getUsersPlaylists(string $userId, int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/users/'.$userId.'/playlists', [
             'limit' => $limit,
             'offset' => $offset,
@@ -640,6 +669,8 @@ class SpotifyService
      */
     public function searchForItem(string $query, array $types, ?string $market = null, int $limit = 20, int $offset = 0, ?string $include_external = null): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/search', [
             'q' => $query,
             'type' => implode(',', $types),
@@ -692,6 +723,8 @@ class SpotifyService
      */
     public function getShowEpisodes(string $showId, ?string $market = null, int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/shows/'.$showId.'/episodes', [
             'market' => $market,
             'limit' => $limit,
@@ -708,6 +741,8 @@ class SpotifyService
      */
     public function getUsersSavedShows(int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/me/shows', [
             'limit' => $limit,
             'offset' => $offset,
@@ -768,6 +803,8 @@ class SpotifyService
      */
     public function getUsersSavedTracks(?string $market = null, int $limit = 20, int $offset = 0): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/me/tracks', [
             'market' => $market,
             'limit' => $limit,
@@ -819,6 +856,8 @@ class SpotifyService
      */
     public function getFollowedArtists(?string $after = null, int $limit = 20): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/me/following', [
             'type' => 'artist',
             'after' => $after,
@@ -866,6 +905,8 @@ class SpotifyService
      */
     public function getUserTop(SpotifyTopType $type, SpotifyTimeRange $timeRange = SpotifyTimeRange::MEDIUM_TERM, int $limit = 20): Response
     {
+        $limit = $this->clampLimit($limit);
+
         return $this->makeRequest('get', '/me/top/'.$type->value, [
             'limit' => $limit,
             'time_range' => $timeRange->value,
