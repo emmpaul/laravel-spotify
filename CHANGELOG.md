@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-spotify` will be documented in this file.
 
+## Release v1.3.0 - 2026-02-11
+
+### What's Changed
+
+* feat: add playlist management methods by @emmpaul in https://github.com/emmpaul/laravel-spotify/pull/11
+* feat: add library management methods for saving/removing items by @emmpaul in https://github.com/emmpaul/laravel-spotify/pull/12
+
+**Full Changelog**: https://github.com/emmpaul/laravel-spotify/compare/v1.2.0...v1.3.0
+
 ## release v1.2.0 - 2026-02-11
 
 ### What's Changed
