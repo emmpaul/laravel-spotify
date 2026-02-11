@@ -49,7 +49,8 @@ class SpotifyAuthController extends Controller
 
             return redirect()->intended(config('spotify.redirect_route_after_login'));
         } catch (\Exception $e) {
-            Log::error('Spotify authentication failed: ' . $e->getMessage());
+            Log::error('Spotify authentication failed: '.$e->getMessage());
+
             return redirect('/login')->withErrors([
                 'spotify' => 'Authentication with Spotify failed',
             ]);
