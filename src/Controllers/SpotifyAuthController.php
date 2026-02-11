@@ -2,10 +2,12 @@
 
 namespace emmpaul\LaravelSpotify\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
 class SpotifyAuthController extends Controller
@@ -38,15 +40,18 @@ class SpotifyAuthController extends Controller
                 'spotify_avatar' => $spotifyUser->getAvatar(),
                 'spotify_token' => $spotifyUser->token ?? null,
                 'spotify_refresh_token' => $spotifyUser->refreshToken ?? null,
+                'spotify_token_expires_at' => $spotifyUser->expiresIn !== null
+                    ? Carbon::now()->addSeconds((int) $spotifyUser->expiresIn)
+                    : Carbon::now()->addMinutes(59),
             ]);
 
             Auth::login($user);
 
             return redirect()->intended(config('spotify.redirect_route_after_login'));
-
         } catch (\Exception $e) {
+            Log::error('Spotify authentication failed: ' . $e->getMessage());
             return redirect('/login')->withErrors([
-                'spotify' => 'Authentication with Spotify failed: '.$e->getMessage(),
+                'spotify' => 'Authentication with Spotify failed',
             ]);
         }
     }
