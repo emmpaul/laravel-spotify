@@ -2,6 +2,7 @@
 
 namespace emmpaul\LaravelSpotify\Services;
 
+use emmpaul\LaravelSpotify\Enums\SpotifyRepeatState;
 use emmpaul\LaravelSpotify\Enums\SpotifyTimeRange;
 use emmpaul\LaravelSpotify\Enums\SpotifyTopType;
 use Exception;
@@ -627,6 +628,141 @@ class SpotifyService
         return $this->makeRequest('put', '/me/player/pause', [
             'device_id' => $deviceId,
         ]);
+    }
+
+    /**
+     * Skip to the next track in the user's queue.
+     *
+     * @param  string|null  $deviceId  The ID of the device to target (default: null).
+     * @return Response The HTTP response.
+     */
+    public function skipToNext(?string $deviceId = null): Response
+    {
+        $query = http_build_query(array_filter(['device_id' => $deviceId]));
+
+        return $this->makeRequest('post', '/me/player/next'.($query ? '?'.$query : ''));
+    }
+
+    /**
+     * Skip to the previous track in the user's queue.
+     *
+     * @param  string|null  $deviceId  The ID of the device to target (default: null).
+     * @return Response The HTTP response.
+     */
+    public function skipToPrevious(?string $deviceId = null): Response
+    {
+        $query = http_build_query(array_filter(['device_id' => $deviceId]));
+
+        return $this->makeRequest('post', '/me/player/previous'.($query ? '?'.$query : ''));
+    }
+
+    /**
+     * Seek to a position in the currently playing track.
+     *
+     * @param  int  $positionMs  The position in milliseconds to seek to.
+     * @param  string|null  $deviceId  The ID of the device to target (default: null).
+     * @return Response The HTTP response.
+     */
+    public function seekToPosition(int $positionMs, ?string $deviceId = null): Response
+    {
+        $params = ['position_ms' => $positionMs];
+
+        if ($deviceId !== null) {
+            $params['device_id'] = $deviceId;
+        }
+
+        return $this->makeRequest('put', '/me/player/seek?'.http_build_query($params));
+    }
+
+    /**
+     * Set the repeat mode for the user's playback.
+     *
+     * @param  SpotifyRepeatState|string  $state  The repeat state (track, context, off).
+     * @param  string|null  $deviceId  The ID of the device to target (default: null).
+     * @return Response The HTTP response.
+     */
+    public function setRepeatMode(SpotifyRepeatState|string $state, ?string $deviceId = null): Response
+    {
+        $stateValue = $state instanceof SpotifyRepeatState ? $state->value : $state;
+
+        $params = ['state' => $stateValue];
+
+        if ($deviceId !== null) {
+            $params['device_id'] = $deviceId;
+        }
+
+        return $this->makeRequest('put', '/me/player/repeat?'.http_build_query($params));
+    }
+
+    /**
+     * Toggle shuffle on or off for the user's playback.
+     *
+     * @param  bool  $state  Whether to enable shuffle.
+     * @param  string|null  $deviceId  The ID of the device to target (default: null).
+     * @return Response The HTTP response.
+     */
+    public function toggleShuffle(bool $state, ?string $deviceId = null): Response
+    {
+        $params = ['state' => $state ? 'true' : 'false'];
+
+        if ($deviceId !== null) {
+            $params['device_id'] = $deviceId;
+        }
+
+        return $this->makeRequest('put', '/me/player/shuffle?'.http_build_query($params));
+    }
+
+    /**
+     * Set the volume for the user's playback.
+     *
+     * @param  int  $volumePercent  The volume to set (0-100).
+     * @param  string|null  $deviceId  The ID of the device to target (default: null).
+     * @return Response The HTTP response.
+     */
+    public function setPlaybackVolume(int $volumePercent, ?string $deviceId = null): Response
+    {
+        $volumePercent = max(0, min(100, $volumePercent));
+
+        $params = ['volume_percent' => $volumePercent];
+
+        if ($deviceId !== null) {
+            $params['device_id'] = $deviceId;
+        }
+
+        return $this->makeRequest('put', '/me/player/volume?'.http_build_query($params));
+    }
+
+    /**
+     * Transfer playback to a new device.
+     *
+     * @param  string|array<string>  $deviceIds  The ID(s) of the device(s) to transfer to.
+     * @param  bool  $play  Whether to start playing on the new device (default: false).
+     * @return Response The HTTP response.
+     */
+    public function transferPlayback(string|array $deviceIds, bool $play = false): Response
+    {
+        return $this->makeRequest('put', '/me/player', [
+            'device_ids' => is_array($deviceIds) ? $deviceIds : [$deviceIds],
+            'play' => $play,
+        ]);
+    }
+
+    /**
+     * Add an item to the end of the user's current playback queue.
+     *
+     * @param  string  $uri  The URI of the item to add (e.g. spotify:track:xxx).
+     * @param  string|null  $deviceId  The ID of the device to target (default: null).
+     * @return Response The HTTP response.
+     */
+    public function addItemToPlaybackQueue(string $uri, ?string $deviceId = null): Response
+    {
+        $params = ['uri' => $uri];
+
+        if ($deviceId !== null) {
+            $params['device_id'] = $deviceId;
+        }
+
+        return $this->makeRequest('post', '/me/player/queue?'.http_build_query($params));
     }
 
     // Playlists

@@ -1,5 +1,6 @@
 <?php
 
+use emmpaul\LaravelSpotify\Enums\SpotifyRepeatState;
 use emmpaul\LaravelSpotify\Services\SpotifyService;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
@@ -808,6 +809,224 @@ describe('Player', function () {
         });
 
         expect($response)->toBeInstanceOf(Response::class);
+    });
+});
+
+describe('Player Controls', function () {
+    it('resumePlayback calls correct endpoint', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/play*' => Http::response(null, 204),
+        ]);
+
+        $this->service->resumePlayback('device-123');
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/player/play') &&
+                   $request->method() === 'PUT';
+        });
+    });
+
+    it('resumePlayback sends track URIs in body', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/play*' => Http::response(null, 204),
+        ]);
+
+        $this->service->resumePlayback('device-123', ['abc', 'def']);
+
+        Http::assertSent(function ($request) {
+            $body = $request->data();
+
+            return str_contains($request->url(), 'me/player/play') &&
+                   isset($body['uris']) &&
+                   $body['uris'] === ['spotify:track:abc', 'spotify:track:def'];
+        });
+    });
+
+    it('pausePlayback calls correct endpoint', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/pause*' => Http::response(null, 204),
+        ]);
+
+        $this->service->pausePlayback('device-123');
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/player/pause') &&
+                   $request->method() === 'PUT';
+        });
+    });
+
+    it('skipToNext calls correct endpoint with device_id in query string', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/next*' => Http::response(null, 204),
+        ]);
+
+        $this->service->skipToNext('device-123');
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/player/next') &&
+                   str_contains($request->url(), 'device_id=device-123') &&
+                   $request->method() === 'POST';
+        });
+    });
+
+    it('skipToPrevious calls correct endpoint with device_id in query string', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/previous*' => Http::response(null, 204),
+        ]);
+
+        $this->service->skipToPrevious('device-123');
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/player/previous') &&
+                   str_contains($request->url(), 'device_id=device-123') &&
+                   $request->method() === 'POST';
+        });
+    });
+
+    it('seekToPosition calls correct endpoint with query params', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/seek*' => Http::response(null, 204),
+        ]);
+
+        $this->service->seekToPosition(30000, 'device-123');
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/player/seek') &&
+                   str_contains($request->url(), 'position_ms=30000') &&
+                   str_contains($request->url(), 'device_id=device-123') &&
+                   $request->method() === 'PUT';
+        });
+    });
+
+    it('setRepeatMode calls correct endpoint with state in query string', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/repeat*' => Http::response(null, 204),
+        ]);
+
+        $this->service->setRepeatMode('track', 'device-123');
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/player/repeat') &&
+                   str_contains($request->url(), 'state=track') &&
+                   str_contains($request->url(), 'device_id=device-123') &&
+                   $request->method() === 'PUT';
+        });
+    });
+
+    it('setRepeatMode accepts SpotifyRepeatState enum', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/repeat*' => Http::response(null, 204),
+        ]);
+
+        $this->service->setRepeatMode(SpotifyRepeatState::CONTEXT);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/player/repeat') &&
+                   str_contains($request->url(), 'state=context') &&
+                   $request->method() === 'PUT';
+        });
+    });
+
+    it('toggleShuffle calls correct endpoint with state in query string', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/shuffle*' => Http::response(null, 204),
+        ]);
+
+        $this->service->toggleShuffle(true, 'device-123');
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/player/shuffle') &&
+                   str_contains($request->url(), 'state=true') &&
+                   str_contains($request->url(), 'device_id=device-123') &&
+                   $request->method() === 'PUT';
+        });
+    });
+
+    it('setPlaybackVolume calls correct endpoint with volume in query string', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/volume*' => Http::response(null, 204),
+        ]);
+
+        $this->service->setPlaybackVolume(75, 'device-123');
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/player/volume') &&
+                   str_contains($request->url(), 'volume_percent=75') &&
+                   str_contains($request->url(), 'device_id=device-123') &&
+                   $request->method() === 'PUT';
+        });
+    });
+
+    it('setPlaybackVolume clamps volume above 100 to 100', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/volume*' => Http::response(null, 204),
+        ]);
+
+        $this->service->setPlaybackVolume(150);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'volume_percent=100');
+        });
+    });
+
+    it('setPlaybackVolume clamps volume below 0 to 0', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/volume*' => Http::response(null, 204),
+        ]);
+
+        $this->service->setPlaybackVolume(-10);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'volume_percent=0');
+        });
+    });
+
+    it('transferPlayback calls correct endpoint with device IDs', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player' => Http::response(null, 204),
+        ]);
+
+        $this->service->transferPlayback('device-123', true);
+
+        Http::assertSent(function ($request) {
+            $body = $request->data();
+
+            return $request->url() === 'https://api.spotify.com/v1/me/player' &&
+                   $request->method() === 'PUT' &&
+                   $body['device_ids'] === ['device-123'] &&
+                   $body['play'] === true;
+        });
+    });
+
+    it('transferPlayback accepts array of device IDs', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player' => Http::response(null, 204),
+        ]);
+
+        $this->service->transferPlayback(['device-1', 'device-2']);
+
+        Http::assertSent(function ($request) {
+            $body = $request->data();
+
+            return $request->method() === 'PUT' &&
+                   $body['device_ids'] === ['device-1', 'device-2'] &&
+                   $body['play'] === false;
+        });
+    });
+
+    it('addItemToPlaybackQueue calls correct endpoint with query params', function () {
+        Http::fake([
+            'api.spotify.com/v1/me/player/queue*' => Http::response(null, 204),
+        ]);
+
+        $this->service->addItemToPlaybackQueue('spotify:track:abc123', 'device-123');
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'me/player/queue') &&
+                   str_contains($request->url(), 'uri=spotify') &&
+                   str_contains($request->url(), 'device_id=device-123') &&
+                   $request->method() === 'POST';
+        });
     });
 });
 

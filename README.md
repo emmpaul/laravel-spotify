@@ -267,10 +267,30 @@ $spotify->api()->getRecentlyPlayedTracks(50);
 
 #### Player/Playback
 ```php
+use emmpaul\LaravelSpotify\Enums\SpotifyRepeatState;
+
+// Get player info
 $spotify->api()->getPlaybackState();
 $spotify->api()->getCurrentlyPlayingTrack();
 $spotify->api()->getAvailableDevices();
 $spotify->api()->getTheUsersQueue();
+
+// Playback controls
+$spotify->api()->resumePlayback($deviceId);
+$spotify->api()->pausePlayback($deviceId);
+$spotify->api()->skipToNext($deviceId);
+$spotify->api()->skipToPrevious($deviceId);
+$spotify->api()->seekToPosition(30000, $deviceId); // position in ms
+
+// Playback settings
+$spotify->api()->setRepeatMode('track', $deviceId); // 'track', 'context', or 'off'
+$spotify->api()->setRepeatMode(SpotifyRepeatState::CONTEXT); // or use the enum
+$spotify->api()->toggleShuffle(true, $deviceId);
+$spotify->api()->setPlaybackVolume(75, $deviceId); // 0-100, clamped automatically
+
+// Transfer and queue
+$spotify->api()->transferPlayback($deviceId, play: true);
+$spotify->api()->addItemToPlaybackQueue('spotify:track:xxxx', $deviceId);
 ```
 
 #### Shows
